@@ -1,0 +1,62 @@
+Theory: 
+State space model of LTI System can be represented as 
+X' = Ax + Bu 
+Y = cx + Du
+the first and the second equations are known as state equation and output respectively, where: 
+x and X' are state vector and differential state vector
+U and Y input and output vector 
+A is the system matrix 
+B and c are input and output matrix 
+D is forward matrix 
+
+
+Prog 1: rng("default")
+sys = rss(5);
+x0 = [1,2,3,4,5];
+initial(sys,x0)
+a = [-0.5572, -0.7814; 0.7814, 0];
+c = [1.9691  6.4493];
+x0 = [1 ; 0];
+
+sys = ss(a,[],c,[]);
+initial(sys,x0)
+sys = ss([0, tf([3 0],[1 1 10]) ; tf([1 1],[1 5]), tf(2,[1 6])]);
+size(sys)
+x0 = [0.3,0.25,1,4];
+initial(sys,x0);
+sys = ss(zpk(-1,[-0.2+3j,-0.2-3j],1)*tf([1 1],[1 0.05]));
+tFinal = 15;
+x0 = [4,2,3];
+initial(sys,x0,tFinal);
+
+
+Prog 2: rng('default');
+sys1 = rss(4); 
+sys2 = rss(4);
+sys3 = rss(4);
+x0 = [1,1,1,1];
+t = 0:0.1:5;
+initial(sys1,'r--',sys2,'b',sys3,'g-.',x0,t)
+a = [-0.5572, -0.7814; 0.7814, 0];
+c = [1.9691  6.4493];
+x0 = [1 ; 0];
+sys = ss(a,[],c,[]);
+[y,tOut,x] = initial(sys,x0);
+rng('default');
+sys = rss(6,3,2); 
+x0 = [0.1,0.3,0.05,0.4,0.75,1];
+t = 0:0.1:15;
+[y,tOut,x] = initial(sys,x0,t);
+
+
+Prog 3: Create a state-space model with a sample time of 0.25 seconds and the following state-space matrices
+A=   B=   C=   D=0
+
+A=[-1.5 -2;1 0];
+B=[0.5;0]; 
+C=[0 1];
+D=0;
+Ts=0.25;
+x0 =[1;0];
+sys=ss (A, B, C, D, Ts);
+initial (sys, x0)

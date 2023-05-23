@@ -1,0 +1,91 @@
+PID Controller...........
+#Normal PID....
+G = zpk([],[-1,-1],1);
+C = pid(2,1.3,0.3,0.5);
+S = tf(5,[1 4]);
+F = tf(1,[1 1]);
+open_loop = S*G*C;
+T = feedback(G*C,S);
+Try = T*F;
+stepplot(Try)
+
+#Z-N method.......
+close all
+clear all
+clc
+D = 0.5;
+E = 48;
+R = 10;
+C = 100e-6;
+L = 100e-6;
+Vc = E/(1-D);
+IL = E/(R*(1-D)^2);
+A = [0 , -(1-D)/L ; (1-D)/C , -1/(R*C)];
+B = [Vc/L ; -IL/C];
+C = [0 , 1];
+D = 0;
+s = tf('s');
+TF = tf(ss(A,B,C,D));
+syms K
+CE = cell2mat(TF.Denominator) + K*cell2mat(TF.Numerator);
+nonzero = find(cell2mat(TF.Numerator)~=0);
+Kvalues = zeros(1,length(CE));
+for i = nonzero
+        Kvalues(i) = solve(CE(i),K);
+end
+Ku = Kvalues(Kvalues> 0 & min(Kvalues));
+System = feedback(Ku*TF,1);
+Poles = abs(pole(System));
+Frecuency = Poles(1);
+Pu = 2*pi/Frecuency;
+Kp = 0.5*Ku;
+P = Kp;
+System = feedback(P*TF,1);
+Kp = 0.5*Ku;
+P = Kp;
+System = feedback(P*TF,1);
+step(48*System,'g')
+hold on
+Kp = 0.45*Ku;
+Ti = Pu/1.2;
+Ki = Kp/Ti;
+PI = (Kp + Ki/s);
+System = feedback(PI*TF,1);
+step(48*System,'r')
+Kp = 0.6*Ku;
+Ti = Pu/2;
+Ki = Kp/Ti;
+Td = Pu/8;
+Kd = Kp*Td;
+PID = (Kp + s*Kd + Ki/s);
+System = feedback(PID*TF,1);
+step(48*System,'b')
+
+extra.....
+n1=[1];
+d1=[1 10 20];
+g1=tf(n1,d1)
+
+
+n1=[300];
+d1=[1 10 20]
+g1=tf(n1,d1)
+g2=feedback(g1,1)
+t=0:0.1:10;
+y1=step(g2,t);
+plot(t,y1);
+xlabel('time');
+ylabel('y1');
+title('step response of type zero system');
+
+
+n1=[300];
+d1=[1 10 20]
+g1=tf(n1,d1)
+g2=feedback(g1,1)
+t=0:0.1:10;
+y1=impulse(g2,t);
+plot(t,y1);
+xlabel('time');
+ylabel('y1');
+title('impulse response of type zero system');
